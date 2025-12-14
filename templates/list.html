@@ -66,14 +66,12 @@
 
     .btn {
       display: inline-block;
-      margin-top: 30px;
-      padding: 12px 25px;
+      padding: 6px 14px;
       background-color: #43a047;
       color: white;
       text-decoration: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      margin-right: 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
       transition: background 0.3s ease;
     }
 
@@ -102,10 +100,13 @@
         <th>Version</th>
         <th>Image</th>
         <th>Ports</th>
+        <th>Actions</th> <!-- NEW -->
       </tr>
+
       {% for container in containers %}
       <tr>
         <td>{{ container.name }}</td>
+
         <td>
           {% if container.status == "running" %}
             <span class="badge-running">Running</span>
@@ -113,9 +114,22 @@
             <span class="badge-other">{{ container.status }}</span>
           {% endif %}
         </td>
+
         <td>{{ container.version }}</td>
         <td>{{ container.image }}</td>
         <td>{{ container.ports }}</td>
+
+        <!-- ACTIONS COLUMN -->
+        <td>
+          {% if container.status == "running" and os_type == "Linux Desktop" %}
+            <a class="btn"
+               href="/linux/desktop/desktop_list/commands/{{ container.name }}">
+              Commands
+            </a>
+          {% else %}
+            -
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </table>
@@ -123,9 +137,15 @@
       <p>No {{ os_type }} containers are currently running.</p>
     {% endif %}
 
-    <a class="btn" href="/linux/{{ 'server' if os_type == 'Linux Server' else 'desktop' }}">⬅ Back to {{ os_type }} Options</a>
-    <a class="btn btn-secondary" href="/">🏠 Home</a>
+    <br><br>
+
+    <a class="btn" href="/linux/{{ 'server' if os_type == 'Linux Server' else 'desktop' }}">
+      ⬅ Back to {{ os_type }} Options
+    </a>
+
+    <a class="btn btn-secondary" href="/">
+      🏠 Home
+    </a>
   </div>
 </body>
 </html>
-
