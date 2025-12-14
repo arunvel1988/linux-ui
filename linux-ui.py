@@ -202,11 +202,13 @@ def generate_random_name(prefix):
 
 
 
+########################################################################################
 def create_linux_compose_file(version, container_name):
     ssh_port = get_random_port()
 
     os.makedirs("compose_files", exist_ok=True)
     os.makedirs("linux", exist_ok=True)
+    os.makedirs("commands", exist_ok=True)  # ensure commands folder exists
 
     volume_dir = f"./linux/{container_name}"
     os.makedirs(volume_dir, exist_ok=True)
@@ -223,6 +225,7 @@ services:
       - "{ssh_port}:22"
     volumes:
       - {volume_dir}:/data
+      - ./commands:/commands   # <--- mount commands folder
     restart: always
     stop_grace_period: 2m
     command: tail -f /dev/null
@@ -233,6 +236,7 @@ services:
         f.write(compose_content)
 
     return file_path, container_name, ssh_port
+###########################################################################
 
 
 
