@@ -1,0 +1,14 @@
+<h2>Container: {{ container }}</h2>
+<h3>Select Command</h3>
+
+<ul>
+{% for cmd in commands %}
+  <li>
+    <a href="/linux/desktop/desktop_list/commands/{{ container }}/run/{{ cmd }}">
+      Run {{ cmd }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+
+<a href="/linux/desktop/desktop_list">Back</a>
