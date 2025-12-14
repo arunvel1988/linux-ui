@@ -210,8 +210,8 @@ def create_linux_compose_file(version, container_name):
     os.makedirs("linux", exist_ok=True)
     os.makedirs("commands", exist_ok=True)  # ensure commands folder exists
 
-    volume_dir = f"./linux/{container_name}"
-    os.makedirs(volume_dir, exist_ok=True)
+    volume_dir = os.path.abspath(f"./linux/{container_name}")
+    commands_dir = os.path.abspath("./commands")  # absolute path to commands folder
 
     image_name = f"{version}"  
 
@@ -225,17 +225,18 @@ services:
       - "{ssh_port}:22"
     volumes:
       - {volume_dir}:/data
-      - ./commands:/commands   # <--- mount commands folder
+      - {commands_dir}:/commands   # <--- absolute path to commands folder
     restart: always
     stop_grace_period: 2m
     command: tail -f /dev/null
 """
 
-    file_path = f"compose_files/{container_name}.yml"
+    file_path = os.path.abspath(f"compose_files/{container_name}.yml")
     with open(file_path, "w") as f:
         f.write(compose_content)
 
     return file_path, container_name, ssh_port
+
 ###########################################################################
 
 
