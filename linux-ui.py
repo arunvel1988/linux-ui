@@ -343,7 +343,7 @@ def list_linux_desktops():
 ######################################################################################################################
 @app.route("/linux/desktop/desktop_list/commands/<container_name>/run/<cmd>")
 def run_desktop_command(container_name, cmd):
-    allowed_commands = ["ls", "pwd", "mkdir"]
+    allowed_commands = ["ls", "pwd", "mkdir","cd","touch","rm","rmdir","cp","awk","cat","chmod","date","echo","files","find","grep","imp_files","mv","network","pipe","ps","pwd","sed","sort","touch","uniq"]
 
     if cmd not in allowed_commands:
         return "Invalid command", 400
