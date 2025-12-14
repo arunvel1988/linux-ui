@@ -335,7 +335,57 @@ def list_linux_desktops():
             print(f"[!] Skipped container {c.name} due to error: {e}")
     return render_template("list.html", os_type="Linux Desktop", containers=containers)
 
+######################################################################################################################
 
+import tarfile
+import io
+
+def copy_commands_to_container(container, local_dir="commands", container_dir="/commands"):
+    tar_stream = io.BytesIO()
+
+    with tarfile.open(fileobj=tar_stream, mode="w") as tar:
+        for file in os.listdir(local_dir):
+            tar.add(os.path.join(local_dir, file), arcname=file)
+
+    tar_stream.seek(0)
+    container.put_archive(container_dir, tar_stream)
+
+    container.exec_run("chmod +x /commands/*.sh")
+
+############################################################################################
+
+@app.route("/linux/desktop/desktop_list/commands/<container_name>")
+def desktop_command_menu(container_name):
+    commands = ["ls", "pwd", "mkdir"]
+    return render_template(
+        "commands.html",
+        container=container_name,
+        commands=commands
+    )
+##############################################################
+
+@app.route("/linux/desktop/desktop_list/commands/<container_name>/run/<cmd>")
+def run_desktop_command(container_name, cmd):
+    allowed_commands = ["ls", "pwd", "mkdir"]
+
+    if cmd not in allowed_commands:
+        return "Invalid command", 400
+
+    container = client.containers.get(container_name)
+
+    # copy scripts every time (safe for teaching)
+    copy_commands_to_container(container)
+
+    result = container.exec_run(f"/commands/{cmd}.sh")
+
+    return render_template(
+        "command_output.html",
+        container=container_name,
+        command=cmd,
+        output=result.output.decode()
+    )
+
+##################################################################
 
 
 if __name__ == "__main__":
