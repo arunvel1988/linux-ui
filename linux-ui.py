@@ -364,7 +364,7 @@ def run_desktop_command(container_name, cmd):
 
 @app.route("/linux/desktop/desktop_list/commands/<container_name>")
 def desktop_command_menu(container_name):
-    commands = ["ls", "pwd", "mkdir","cd"]
+    commands = ["ls", "pwd", "mkdir","cd","touch","rm","rmdir","cp","awk","cat","chmod","date","echo","files","find","grep","imp_files","mv","network","pipe","ps","pwd","sed","sort","touch","uniq"]
     return render_template(
         "commands.html",
         container=container_name,
