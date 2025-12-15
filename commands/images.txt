@@ -1,0 +1,3 @@
+nginx:latest
+redis:7
+alpine:3.19
