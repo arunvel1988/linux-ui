@@ -216,7 +216,7 @@ def create_linux_compose_file(version, container_name, is_desktop=False):
 
     # 👉 IMPORTANT: choose image
     if is_desktop:
-        image_name = f"linuxserver/webtop:{version}"   # GUI image
+        image_name = f"{version}"   # GUI image
     else:
         image_name = f"{version}"  # normal server image
 
