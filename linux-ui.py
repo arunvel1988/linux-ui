@@ -203,17 +203,26 @@ def generate_random_name(prefix):
 
 
 ########################################################################################
-def create_linux_compose_file(version, container_name):
+def create_linux_compose_file(version, container_name, is_desktop=False):
     ssh_port = get_random_port()
+    web_port = get_random_port() if is_desktop else None
 
     os.makedirs("compose_files", exist_ok=True)
     os.makedirs("linux", exist_ok=True)
-    os.makedirs("commands", exist_ok=True)  # ensure commands folder exists
+    os.makedirs("commands", exist_ok=True)
 
     volume_dir = os.path.abspath(f"./linux/{container_name}")
-    commands_dir = os.path.abspath("./commands")  # absolute path to commands folder
+    commands_dir = os.path.abspath("./commands")
 
-    image_name = f"{version}"  
+    # 👉 IMPORTANT: choose image
+    if is_desktop:
+        image_name = f"linuxserver/webtop:{version}"   # GUI image
+    else:
+        image_name = f"{version}"  # normal server image
+
+    ports_block = f'- "{ssh_port}:22"\n'
+    if is_desktop:
+        ports_block += f'      - "{web_port}:3000"\n'
 
     compose_content = f"""
 version: '3.7'
@@ -222,20 +231,24 @@ services:
     image: {image_name}
     container_name: {container_name}
     ports:
-      - "{ssh_port}:22"
+      {ports_block}
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
     volumes:
-      - {volume_dir}:/data
-      - {commands_dir}:/commands   # <--- absolute path to commands folder
+      - {volume_dir}:/config
+      - {commands_dir}:/commands
+    shm_size: "1gb"
     restart: always
-    stop_grace_period: 2m
-    command: tail -f /dev/null
 """
 
     file_path = os.path.abspath(f"compose_files/{container_name}.yml")
+
     with open(file_path, "w") as f:
         f.write(compose_content)
 
-    return file_path, container_name, ssh_port
+    return file_path, container_name, ssh_port, web_port
 
 ###########################################################################
 
