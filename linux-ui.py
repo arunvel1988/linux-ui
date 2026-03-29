@@ -282,13 +282,13 @@ def linux_server():
 @app.route("/linux/desktop", methods=["GET", "POST"])
 def linux_desktop():
     if request.method == "POST":
-        version = request.form["version"]  # e.g. ubuntu-kde, ubuntu-xfce
+        version = request.form["version"]  # e.g. ubuntu-kde
         name = request.form["name"].strip() or generate_random_name("linuxdesk")
 
-        # Create docker-compose file
-        path, container, web_port = create_linux_compose_file(version, name)
+        path, container, ssh_port, web_port = create_linux_compose_file(
+            version, name, is_desktop=True
+        )
 
-        # Run container
         run_docker_compose(path, container)
 
         return render_template(
@@ -296,8 +296,8 @@ def linux_desktop():
             os_type="Linux Desktop",
             version=version,
             container=container,
-            rdp=None,
-            web=f"http://<server-ip>:{web_port}"   # GUI URL
+            rdp=ssh_port,
+            web=f"http://<server-ip>:{web_port}"
         )
 
     return render_template("linux_desktop.html")
@@ -313,10 +313,21 @@ def install_linux_server(version):
 @app.route("/linux/desktop/install/<version>")
 def install_linux_desktop(version):
     name = generate_random_name("linuxdesk")
-    path, container, ssh_port = create_linux_compose_file(version, name)
-    run_docker_compose(path, container)
-    return render_template("success.html", os_type="Linux Desktop", version=version, container=container, rdp=ssh_port, web=None)
 
+    path, container, ssh_port, web_port = create_linux_compose_file(
+        version, name, is_desktop=True
+    )
+
+    run_docker_compose(path, container)
+
+    return render_template(
+        "success.html",
+        os_type="Linux Desktop",
+        version=version,
+        container=container,
+        rdp=ssh_port,
+        web=f"http://<server-ip>:{web_port}"
+    )
 
 @app.route("/linux/server/server_list")
 def list_linux_servers():
