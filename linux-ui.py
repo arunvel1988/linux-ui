@@ -236,6 +236,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=UTC
+      - DISABLE_SSL=true 
     volumes:
       - {volume_dir}:/config
       - {commands_dir}:/commands
