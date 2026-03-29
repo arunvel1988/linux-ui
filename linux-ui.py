@@ -269,11 +269,24 @@ def linux_server():
 @app.route("/linux/desktop", methods=["GET", "POST"])
 def linux_desktop():
     if request.method == "POST":
-        version = request.form["version"]  # e.g. ubuntudesktop
+        version = request.form["version"]  # e.g. ubuntu-kde, ubuntu-xfce
         name = request.form["name"].strip() or generate_random_name("linuxdesk")
-        path, container, ssh_port = create_linux_compose_file(version, name)
+
+        # Create docker-compose file
+        path, container, web_port = create_linux_compose_file(version, name)
+
+        # Run container
         run_docker_compose(path, container)
-        return render_template("success.html", os_type="Linux Desktop", version=version, container=container, rdp=ssh_port, web=None)
+
+        return render_template(
+            "success.html",
+            os_type="Linux Desktop",
+            version=version,
+            container=container,
+            rdp=None,
+            web=f"http://<server-ip>:{web_port}"   # GUI URL
+        )
+
     return render_template("linux_desktop.html")
 
 
