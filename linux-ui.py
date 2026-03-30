@@ -260,7 +260,7 @@ services:
 
 def run_docker_compose(compose_file, container_name):
     try:
-        subprocess.run(["docker","compose", "-p", container_name, "-f", compose_file, "up", "-d"], check=True)
+        subprocess.run(["docker-compose", "-p", container_name, "-f", compose_file, "up", "-d"], check=True)
     except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to run Docker Compose: {e}")
         raise
