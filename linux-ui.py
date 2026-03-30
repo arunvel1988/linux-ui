@@ -203,10 +203,13 @@ def generate_random_name(prefix):
 
 
 ########################################################################################
+
+
 def create_linux_compose_file(version, container_name, is_desktop=False):
     ssh_port = get_random_port()
     web_port = get_random_port() if is_desktop else None
 
+    import os
     os.makedirs("compose_files", exist_ok=True)
     os.makedirs("linux", exist_ok=True)
     os.makedirs("commands", exist_ok=True)
@@ -214,15 +217,16 @@ def create_linux_compose_file(version, container_name, is_desktop=False):
     volume_dir = os.path.abspath(f"./linux/{container_name}")
     commands_dir = os.path.abspath("./commands")
 
-    # 👉 IMPORTANT: choose image
-    if is_desktop:
-        image_name = f"{version}"   # GUI image
-    else:
-        image_name = f"{version}"  # normal server image
+    image_name = version
 
-    ports_block = f'- "{ssh_port}:22"\n'
+    # ✅ Build ports list properly
+    ports = [f'"{ssh_port}:22"']
+
     if is_desktop:
-        ports_block += f'      - "{web_port}:3000"\n'
+        ports.append(f'"{web_port}:3000"')
+
+    # Convert to YAML format
+    ports_yaml = "\n      - ".join(ports)
 
     compose_content = f"""
 version: '3.7'
@@ -231,12 +235,12 @@ services:
     image: {image_name}
     container_name: {container_name}
     ports:
-      {ports_block}
+      - {ports_yaml}
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=UTC
-      - DISABLE_SSL=true 
+      - DISABLE_SSL=true
     volumes:
       - {volume_dir}:/config
       - {commands_dir}:/commands
